@@ -1,0 +1,11 @@
+# State local
+terraform.tfstate
+terraform.tfstate.backup
+
+# Variáveis com segredos
+terraform.tfvars
+*.auto.tfvars
+
+# Cache do provider
+.terraform/
+.terraform.lock.hcl
