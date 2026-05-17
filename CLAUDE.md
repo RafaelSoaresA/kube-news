@@ -75,6 +75,40 @@ doctl auth init --access-token <token>
 doctl kubernetes cluster kubeconfig save k8s-aula
 ```
 
+## Terraform
+
+Config lives in `terraform/`. Manages the DOKS cluster (`k8s-aula`) and container registry (`kube-news-rafael`). State is local (`terraform.tfstate`) — not committed.
+
+```bash
+cd terraform
+
+# First-time setup: copy and fill in your DO token
+cp terraform.tfvars.example terraform.tfvars
+
+# Initialize provider (already done — .terraform.lock.hcl is committed)
+terraform init
+
+# Preview changes
+terraform plan
+
+# Apply changes
+terraform apply
+
+# Import existing resource (cluster or registry already exist in DO)
+terraform import digitalocean_kubernetes_cluster.main <cluster-id>
+terraform import digitalocean_container_registry.main kube-news-rafael
+
+# Extract kubeconfig after cluster creation
+terraform output -raw kubeconfig > ../kubeconfig.yaml
+```
+
+**Resources managed:**
+
+| Resource | Terraform name | DO name |
+|---|---|---|
+| DOKS cluster | `digitalocean_kubernetes_cluster.main` | `k8s-aula` |
+| Container registry | `digitalocean_container_registry.main` | `kube-news-rafael` |
+
 ## Seed Data
 
 Use `popula-dados.http` with VS Code REST Client or curl to bulk-insert posts via `POST /api/post` with a JSON body `{ "artigos": [...] }`.
