@@ -104,3 +104,7 @@ node_modules/
 # .tern-port
 
 *.Identifier
+
+# Kubeconfig com credenciais
+*kubeconfig*
+*.kubeconfig
