@@ -4,8 +4,8 @@
 do_token = "seu-token-aqui"
 
 # Valores opcionais (os defaults já refletem o ambiente de aula)
-# cluster_name       = "k8s-aula"
-# region             = "nyc1"
-# node_size          = "s-2vcpu-2gb"
-# node_count         = 2
-# k8s_version_prefix = "1.31"
+# cluster_name = "k8s-aula"
+# region       = "nyc1"
+# node_size    = "s-2vcpu-2gb"
+# node_count   = 2
+# k8s_version  = "1.35.1-do.6"  # doctl kubernetes options versions

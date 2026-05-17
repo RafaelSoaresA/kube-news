@@ -6,6 +6,5 @@ terraform.tfstate.backup
 terraform.tfvars
 *.auto.tfvars
 
-# Cache do provider
+# Cache do provider (lock file deve ficar no git — não ignorar)
 .terraform/
-.terraform.lock.hcl
