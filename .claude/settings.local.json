@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Rename-Item *)",
+      "WebSearch",
+      "PowerShell(winget *)",
+      "PowerShell(Get-Command *)",
+      "PowerShell(doctl version *)",
+      "PowerShell(doctl auth *)",
+      "PowerShell(doctl kubernetes *)",
+      "PowerShell(kubectl get nodes *)",
+      "PowerShell(docker info *)",
+      "PowerShell(doctl registry *)",
+      "PowerShell(kubectl apply *)",
+      "PowerShell(kubectl get pods *)",
+      "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\", \"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\", \"User\"\\); kubectl logs -n kube-news deployment/postgres --previous 2>$null; kubectl describe pod -n kube-news -l app=postgres | Select-String -Pattern \"Events:\" -Context 0,20)",
+      "PowerShell(kubectl rollout status *)"
+    ]
+  }
+}

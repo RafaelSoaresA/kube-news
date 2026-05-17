@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-news
+  namespace: kube-news
+  labels:
+    app: kube-news
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kube-news
+  template:
+    metadata:
+      labels:
+        app: kube-news
+    spec:
+      imagePullSecrets:
+        - name: registry-kube-news
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:15-alpine
+          command:
+            - sh
+            - -c
+            - until pg_isready -h $(DB_HOST) -p $(DB_PORT) -U $(DB_USERNAME); do echo "aguardando postgres..."; sleep 2; done
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_PORT
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+      containers:
+        - name: kube-news
+          image: registry.digitalocean.com/kube-news-rafael/kube-news:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_PORT
+            - name: DB_SSL_REQUIRE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_SSL_REQUIRE
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-news-service
+  namespace: kube-news
+  labels:
+    app: kube-news
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-name: "kube-news-lb"
+    service.beta.kubernetes.io/do-loadbalancer-protocol: "http"
+    service.beta.kubernetes.io/do-loadbalancer-size-slug: "lb-small"
+spec:
+  selector:
+    app: kube-news
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
